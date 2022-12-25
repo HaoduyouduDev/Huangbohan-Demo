@@ -3,7 +3,19 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="../../.gradle/caches/transforms-3/e60daead5039d9f2a22ed25f623fc0d6/transformed/XPopup-2.6.6/res/layout/_xpopup_attach_popup_view.xml" value="0.15520833333333334" />
+        <entry key="../../.gradle/caches/transforms-3/e60daead5039d9f2a22ed25f623fc0d6/transformed/XPopup-2.6.6/res/layout/_xpopup_bottom_impl_list.xml" value="0.4608403523763021" />
+        <entry key="../../.gradle/caches/transforms-3/e60daead5039d9f2a22ed25f623fc0d6/transformed/XPopup-2.6.6/res/layout/_xpopup_bottom_popup_view.xml" value="0.15520833333333334" />
+        <entry key="app/src/main/res/drawable/text_sort_shape.xml" value="0.103" />
+        <entry key="app/src/main/res/drawable/vector_drawable_record.xml" value="0.1645" />
+        <entry key="app/src/main/res/drawable/vector_drawable_record_.xml" value="0.117" />
+        <entry key="app/src/main/res/drawable/vector_drawable_sethost.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/vector_drawable_sethost_.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.24067230224609373" />
+        <entry key="app/src/main/res/layout/activity_sort_image.xml" value="0.242938232421875" />
+        <entry key="app/src/main/res/layout/activity_sort_text.xml" value="0.19015045166015626" />
+        <entry key="app/src/main/res/layout/dialog_record.xml" value="0.827080790201823" />
+        <entry key="app/src/main/res/menu/main_toolbar.xml" value="0.2122726440429688" />
         <entry key="app/src/main/res/xml/file_paths.xml" value="0.1109375" />
       </map>
     </option>

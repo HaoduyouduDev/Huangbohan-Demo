@@ -3,8 +3,12 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="com.huangbohan.sortrubbish">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!--获取手机录音机使用权限，听写、识别、语义理解需要用到此权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
 
     <application
             android:allowBackup="true"
@@ -18,20 +22,31 @@
             android:usesCleartextTraffic="true"
             tools:targetApi="31">
         <activity
+                android:name=".SortText"
+                android:exported="false"
+                android:label="Sort From Text"
+                android:windowSoftInputMode="adjustResize"/>
+        <activity
+                android:name=".SortImage"
+                android:exported="false"
+                android:label="Sort From Image"/>
+        <activity
                 android:name=".MainActivity"
-                android:exported="true">
+                android:exported="true"
+                android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <provider
-                android:authorities="com.huangbohan.sortrubbish.fileprovider"
                 android:name="androidx.core.content.FileProvider"
+                android:authorities="com.huangbohan.sortrubbish.fileprovider"
                 android:exported="false"
                 android:grantUriPermissions="true">
-                <meta-data
+            <meta-data
                     android:name="android.support.FILE_PROVIDER_PATHS"
                     android:resource="@xml/file_paths"/>
         </provider>

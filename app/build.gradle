@@ -32,6 +32,11 @@ android {
     viewBinding {
         enabled = true
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
 }
 
 dependencies {
@@ -44,4 +49,8 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     implementation 'com.squareup.okhttp3:okhttp:4.1.0'
+    implementation 'com.github.li-xiaojun:XPopup:2.6.6'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'info.hoang8f:fbutton:1.0.5'
+    implementation files('libs/Msc.jar')
 }

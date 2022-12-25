@@ -1,21 +1,26 @@
 package com.huangbohan.sortrubbish
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.huangbohan.sortrubbish.databinding.ActivityMainBinding
+import com.lxj.xpopup.XPopup
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.File
@@ -35,31 +40,76 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binging.root)
-        binging.takePhotoBtn.setOnClickListener {
-            // 创建File对象，用于存储拍照后的图片
-            outputImage = File(externalCacheDir, "output_image.jpg")
-            if (outputImage.exists()) {
-                outputImage.delete()
-            }
-            outputImage.createNewFile()
-            imageUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                FileProvider.getUriForFile(this, "com.huangbohan.sortrubbish.fileprovider", outputImage);
+        setSupportActionBar(binging.toorbar)
+
+        binging.fromImage.setOnClickListener {
+            if (checkHost()) {
+                XPopup.Builder(this)
+                    .asBottomList(
+                        "Get Image", arrayOf("Take Photo", "From Album")
+                    ) { position, text ->
+                        when (position) {
+                            0-> {
+                                // 创建File对象，用于存储拍照后的图片
+                                outputImage = File(externalCacheDir, "output_image.jpg")
+                                if (outputImage.exists()) {
+                                    outputImage.delete()
+                                }
+                                outputImage.createNewFile()
+                                imageUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    FileProvider.getUriForFile(this, "com.huangbohan.sortrubbish.fileprovider", outputImage);
+                                } else {
+                                    Uri.fromFile(outputImage);
+                                }
+                                // 启动相机程序
+                                val intent = Intent("android.media.action.IMAGE_CAPTURE")
+                                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+                                startActivityForResult(intent, takePhoto)
+                            }
+                            1 -> {
+                                // 打开文件选择器
+                                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                                // 指定只显示照片
+                                intent.type = "image/*"
+                                startActivityForResult(intent, fromAlbum)
+                            }
+                        }
+                    }
+                    .show()
             } else {
-                Uri.fromFile(outputImage);
+                Toast.makeText(this, "Please set Host.", Toast.LENGTH_SHORT).show()
             }
-            // 启动相机程序
-            val intent = Intent("android.media.action.IMAGE_CAPTURE")
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-            startActivityForResult(intent, takePhoto)
         }
-        binging.fromAlbumBtn.setOnClickListener {
-            // 打开文件选择器
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            // 指定只显示照片
-            intent.type = "image/*"
-            startActivityForResult(intent, fromAlbum)
+
+        binging.fromText.setOnClickListener {
+            if (checkHost()) {
+                startActivity(Intent(this, SortText::class.java))
+            }else {
+                Toast.makeText(this, "Please set Host.", Toast.LENGTH_SHORT).show()
+            }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_toolbar, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.set_host -> {
+                XPopup.Builder(this).asInputConfirm(
+                    "Please input server host.", "ip:port"
+                ) { text ->
+                    getSharedPreferences("data", Context.MODE_PRIVATE).edit().apply {
+                        putString("host", text)
+                        apply()
+                    }
+                }.show()
+            }
+        }
+        return true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -89,43 +139,7 @@ class MainActivity : AppCompatActivity() {
     private fun setImage(bitmap: Bitmap) {
         thread {
             saveBitmap("temp.jpg", bitmap)
-            runOnUiThread {
-                binging.imageView.setImageBitmap(BitmapFactory.decodeFile(cacheDir!!.absolutePath + "/temp.jpg"))
-                //1.创建OkHttpClient对象
-                val okHttpClient = OkHttpClient()
-                //上传的图片
-                val file = File(cacheDir!!.absolutePath, "temp.jpg")
-                //2.通过new MultipartBody build() 创建requestBody对象，
-                val requestBody: RequestBody = MultipartBody.Builder() //设置类型是表单
-                    .setType(MultipartBody.FORM) //添加数据
-                    .addFormDataPart(
-                        "image", "post.jpg",
-                        RequestBody.create("image/jpeg".toMediaTypeOrNull(), file)
-                    )
-                    .build()
-                //3.创建Request对象，设置URL地址，将RequestBody作为post方法的参数传入
-                val request: Request = Request.Builder().url("http://" + binging.editText.text.toString() + "/sort_rubbish").post(requestBody).build()
-                //4.创建一个call对象,参数就是Request请求对象
-                val call: Call = okHttpClient.newCall(request)
-                //5.请求加入调度,重写回调方法
-                call.enqueue(object : Callback{
-                    override fun onFailure(call: Call, e: IOException) {
-                        Log.e("MainActivity", e.toString())
-                        runOnUiThread {
-                            Toast.makeText(this@MainActivity, "Failure to get data!", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                    override fun onResponse(call: Call, response: Response) {
-                        runOnUiThread {
-                            Toast.makeText(this@MainActivity, "Successful to get data!", Toast.LENGTH_SHORT).show()
-                            response.body?.string().let {
-                                Toast.makeText(this@MainActivity, it, Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-                })
-            }
+            startActivity(Intent(this, SortImage::class.java))
         }
     }
 
@@ -176,4 +190,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun checkHost(): Boolean = !getSharedPreferences("data", Context.MODE_PRIVATE).getString("host", null).isNullOrEmpty()
 }

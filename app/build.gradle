@@ -51,6 +51,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.1.0'
     implementation 'com.github.li-xiaojun:XPopup:2.6.6'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'info.hoang8f:fbutton:1.0.5'
+//    implementation 'info.hoang8f:fbutton:1.0.5'
+    implementation project(':fbutton')
     implementation files('libs/Msc.jar')
 }

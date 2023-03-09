@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Sort Rubbish"
 include ':app'
+include ':fbutton'
